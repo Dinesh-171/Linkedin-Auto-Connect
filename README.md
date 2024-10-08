@@ -42,6 +42,7 @@ Follow these steps to install, extract, and run the LinkedIn Auto Connect extens
    ```bash
    cd linkedin-auto-connect
    npx wxt build
+   npm install
 
 ### Step 5: Load the Extension in Chrome  
       

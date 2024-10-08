@@ -1,117 +1,116 @@
 import React, { useState } from 'react';
 import { createRoot } from 'react-dom/client';
 
-// Define a content script that will run on LinkedIn's "Grow My Network" page.
+// Content script for LinkedIn's "Grow My Network" page.
 export default defineContentScript({
-  
-  // Specify the URL pattern where this script will run.
   matches: ['https://www.linkedin.com/mynetwork/grow/*'],
-  
+
   main() {
-    // Define the ConnectButton component, which handles the connection requests.
     const ConnectButton = () => {
-      const [isProcessing, setIsProcessing] = useState(false); // State to track if connection requests are being processed.
+      const [isProcessing, setIsProcessing] = useState(false); // Track connection request processing.
 
-      // Function to handle the click event for sending connection requests.
       const handleConnectClick = () => {
-        // If already processing, prevent further clicks.
-        if (isProcessing) return;
+        if (isProcessing) return; // Prevent multiple clicks during processing.
+        setIsProcessing(true); // Start processing state.
 
-        setIsProcessing(true); // Set processing state to true to indicate the process has started.
+        // Get all "Connect" buttons on the page.
+        const connectButtons = Array.from(document.querySelectorAll('button'))
+          .filter(button => button.innerText.trim().includes('Connect'));
 
-        try {
-          // Select all buttons on the page and filter those that contain the text "Connect".
-          const connectButtons = Array.from(document.querySelectorAll('button')).filter(
-            (button) => button.tagName === 'BUTTON' && button.innerText.trim().includes('Connect')
-          );
+        if (connectButtons.length === 0) {
+          alert('No connection buttons available to click.');
+          setIsProcessing(false); // Reset processing state.
+          return;
+        }
 
-          // If no connect buttons are found, notify the user and exit.
-          if (connectButtons.length === 0) {
-            console.log('No connection buttons found on the page.');
-            alert('No connection buttons available to click.');
+        let index = 0; // Track the current button index.
+
+        const clickButton = () => {
+          const button = connectButtons[index];
+          if (button) {
+            button.click(); // Click the button.
+            console.log(`Clicked Connect button at index: ${index}`);
+          }
+        };
+
+        clickButton(); // Click the first button.
+        index++;
+
+        // Click remaining buttons at random intervals.
+        const interval = setInterval(() => {
+          if (index >= connectButtons.length) {
+            clearInterval(interval); // Stop when done.
+            alert('All connection requests have been sent!');
             setIsProcessing(false); // Reset processing state.
             return;
           }
-
-          let index = 0; // Initialize an index to keep track of the current button being clicked.
-
-          // Function to click a button at the current index.
-          const clickButton = () => {
-            const button = connectButtons[index];
-            if (button) {
-              try {
-                button.click(); // Attempt to click the button.
-                console.log(`Success: Clicked Connect button at index: ${index}`);
-              } catch (error) {
-                console.error(`Error clicking button at index ${index}:`, error);
-              }
-            }
-          };
-
-          // Perform the first click immediately for a quicker user experience.
-          clickButton();
+          clickButton(); // Click the next button.
           index++;
-
-          // Use an interval to click the remaining buttons with a random delay.
-          const interval = setInterval(() => {
-            // Stop the process once all buttons have been clicked.
-            if (index >= connectButtons.length) {
-              clearInterval(interval); // Clear the interval.
-              console.log('All connection requests have been processed.');
-              alert('All connection requests have been sent!');
-              setIsProcessing(false); // Reset processing state.
-              return;
-            }
-
-            clickButton(); // Click the next button.
-            index++; // Move to the next button.
-          }, Math.random() * (3000 - 1000) + 1000); // Random delay between 1-3 seconds to simulate human behavior.
-        } catch (error) {
-          // Handle any errors that occur during the connection process.
-          console.error('An error occurred while sending connection requests:', error);
-          alert('Something went wrong. Please try again.');
-          setIsProcessing(false); // Reset processing state.
-        }
+        }, Math.random() * 2000 + 1000); // Random delay: 1-3 seconds.
       };
 
-      // Render a button to initiate the connection process.
       return (
         <button
           onClick={handleConnectClick}
           style={{
-            position: 'fixed', // Fixed position so it stays on the screen.
-            top: '20px', // 20px from the top.
-            right: '20px', // 20px from the right.
-            zIndex: '9999', // High z-index to ensure it stays on top.
-            padding: '12px 20px', // Padding for a larger clickable area.
-            backgroundColor: isProcessing ? '#005582' : '#0073b1', // Change color based on processing state.
-            color: '#ffffff', // White text color.
-            border: 'none', // Remove default border.
-            borderRadius: '5px', // Rounded corners.
-            fontSize: '16px', // Font size.
-            cursor: 'pointer', // Pointer cursor to indicate clickability.
-            boxShadow: '0 2px 5px rgba(0, 0, 0, 0.2)', // Add subtle shadow for depth.
-            transition: 'background-color 0.3s, transform 0.3s', // Smooth transition for color and scale.
-            transform: isProcessing ? 'scale(1.05)' : 'scale(1)', // Slightly enlarge button when processing.
+            position: 'fixed',
+            top: '20px',
+            right: '20px',
+            zIndex: 9999,
+            padding: '12px 20px',
+            backgroundColor: isProcessing ? '#005582' : '#0073b1',
+            color: '#ffffff',
+            border: 'none',
+            borderRadius: '5px',
+            fontSize: '16px',
+            cursor: 'pointer',
+            boxShadow: '0 2px 5px rgba(0, 0, 0, 0.2)',
+            transition: 'background-color 0.3s, transform 0.3s',
+            transform: isProcessing ? 'scale(1.05)' : 'scale(1)',
           }}
-          disabled={isProcessing} // Disable the button when processing.
+          disabled={isProcessing} // Disable button during processing.
         >
           {isProcessing ? 'Connecting...' : 'Connect with All'}
         </button>
       );
     };
 
-    // Function to render the ConnectButton component into the page.
-    function renderConnectButton() {
-      const container = document.createElement('div'); // Create a container for the button.
-      container.setAttribute('id', 'connect-button-container'); // Assign an ID for easier identification.
-      document.body.appendChild(container); // Append the container to the body.
+    // Render the ConnectButton component into the page.
+    const renderConnectButton = () => {
+      if (document.getElementById('connect-button-container')) return; // Exit if button exists.
 
-      const root = createRoot(container); // Create a React root for the container.
-      root.render(<ConnectButton />); // Render the ConnectButton component into the container.
-    }
+      const container = document.createElement('div'); // Create container for the button.
+      container.id = 'connect-button-container';
+      document.body.appendChild(container); // Append to body.
 
-    // Add an event listener to render the button once the window has fully loaded.
-    window.addEventListener('load', renderConnectButton);
+      const root = createRoot(container); // Create a React root.
+      root.render(<ConnectButton />); // Render the component.
+    };
+
+    // Remove button if not on the specified URL.
+    const hideConnectButton = () => {
+      const container = document.getElementById('connect-button-container');
+      if (container) container.remove();
+    };
+
+    // Add event listener for DOM content loaded.
+    window.addEventListener('DOMContentLoaded', () => {
+      if (window.location.href.includes('/mynetwork/grow')) {
+        renderConnectButton(); // Render if on correct page.
+      } else {
+        hideConnectButton(); // Hide button otherwise.
+      }
+    });
+
+    // Observe URL changes for single-page applications.
+    const observer = new MutationObserver(() => {
+      if (window.location.href.includes('/mynetwork/grow')) {
+        renderConnectButton(); // Re-render if on the correct page.
+      } else {
+        hideConnectButton(); // Hide button if navigating away.
+      }
+    });
+
+    observer.observe(document.body, { childList: true, subtree: true });
   },
 });
