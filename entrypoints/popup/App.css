@@ -1,0 +1,35 @@
+/* Reset default margin and set a common font for the body */
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background-color: #ffffff; 
+}
+
+/* Container for the main app content */
+.app-container {
+  display: flex; /* Use flexbox for easy centering */
+  flex-direction: column; /* Stack children vertically */
+  align-items: center; /* Center-align content horizontally */
+  justify-content: center; /* Center-align content vertically */
+  width: 300px; /* Set a fixed width suitable for pop-up size */
+  height: auto; /* Height adjusts based on content */
+  padding: 20px; /* Add space inside the container */
+  border-radius: 8px; /* Rounded corners for a smoother look */
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2); /* Add a shadow for depth effect */
+}
+
+/* Style for the main title of the app */
+.app-title {
+  font-size: 1.5rem; /* Set font size for a prominent title */
+  font-weight: bold; /* Make the title text bold */
+  margin-bottom: 10px; /* Add space below the title */
+  color: #0073b1; /* Use LinkedIn's signature blue color */
+}
+
+/* Style for the description text under the title */
+.app-description {
+  font-size: 1rem; /* Adjusted size for better readability */
+  line-height: 1.4; /* Increase line spacing for readability */
+  color: #495057; /* Use medium grey for a subtle contrast */
+  text-align: center; /* Center-align text for a balanced look */
+}
