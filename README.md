@@ -1,6 +1,6 @@
 # LinkedIn Auto Connect
 
-![Logo](path_to_your_logo_image)  <!-- Replace with the path to your logo image -->
+![icon128](https://github.com/user-attachments/assets/609c831a-2bb6-4d24-a827-202e003450a2)
 
 **LinkedIn Auto Connect** is a browser extension that automates the process of sending connection requests on LinkedIn. Built using **React**, **JavaScript**, and the **wxt.dev** framework, this extension makes networking easier and faster.
 
